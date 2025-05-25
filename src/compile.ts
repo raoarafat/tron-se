@@ -2,7 +2,7 @@ import * as solc from 'solc';
 import * as fs from 'fs';
 import * as path from 'path';
 
-function compileContract(contractName: string = 'SimpleToken') {
+function compileContract(contractName: string) {
   try {
     console.log(`Compiling ${contractName} contract...`);
 
@@ -88,4 +88,4 @@ if (!contractName) {
   process.exit(1);
 }
 
-compileContract();
+compileContract(contractName);

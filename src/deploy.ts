@@ -2,10 +2,29 @@ import { TronService } from './tronService';
 
 async function deployContract() {
   try {
-    const tronService = new TronService();
-    console.log('Deploying SimpleToken contract...');
+    const contractName = process.argv[2];
+    if (!contractName) {
+      throw new Error('Please provide a contract name as an argument');
+    }
 
-    const contractAddress = await tronService.deployContract('SimpleToken');
+    const tronService = new TronService();
+    const walletAddress = tronService.getAddressFromPrivateKey(
+      process.env.WALLET_PRIVATE_KEY || ''
+    );
+
+    // Check wallet balance
+    const balance = await tronService.getAccountBalance(walletAddress);
+    console.log(`Wallet balance: ${balance} TRX`);
+
+    if (balance < 1) {
+      throw new Error(
+        'Insufficient TRX balance. Please ensure you have at least 1 TRX for deployment.'
+      );
+    }
+
+    console.log(`Deploying ${contractName} contract...`);
+
+    const contractAddress = await tronService.deployContract(contractName);
     console.log('Contract deployed successfully!');
     console.log('Contract Address:', contractAddress);
 
