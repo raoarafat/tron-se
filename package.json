@@ -7,7 +7,9 @@
     "start": "ts-node src/index.ts",
     "server": "ts-node src/server.ts",
     "build": "tsc",
-    "dev": "ts-node-dev --respawn src/server.ts"
+    "dev": "ts-node-dev --respawn src/server.ts",
+    "deploy": "ts-node src/deploy.ts",
+    "compile": "ts-node src/compile.ts"
   },
   "keywords": [
     "tron",
@@ -28,6 +30,7 @@
     "typescript": "^5.3.0"
   },
   "devDependencies": {
+    "solc": "^0.8.30",
     "ts-node-dev": "^2.0.0"
   }
 }
