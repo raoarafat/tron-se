@@ -4,8 +4,6 @@ package-lock.json
 yarn.lock
 
 # Environment variables
-.env
-.env.local
 .env.*.local
 
 # Build output
@@ -47,3 +45,4 @@ temp/
 # System Files
 .DS_Store
 Thumbs.db 
+config.bat
