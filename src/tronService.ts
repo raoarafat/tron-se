@@ -121,15 +121,39 @@ export class TronService {
           'utf8'
         )
       );
+
+      // Initialize contract using the correct TronWeb contract API
       this.stockExchangeContract = await this.tronWeb
         .contract()
-        .at(contractAddress, contractData.abi);
+        .at(contractAddress);
+
+      console.log(
+        'Stock Exchange Initialized address:',
+        this.stockExchangeContract.address
+      );
       console.log('Stock Exchange contract initialized at:', contractAddress);
     } catch (error) {
       console.error('Error initializing stock exchange:', error);
       throw error;
     }
   }
+
+  // async listStock(
+  //   symbol: string,
+  //   name: string,
+  //   price: number,
+  //   totalSupply: number
+  // ) {
+  //   try {
+  //     const result = await this.stockExchangeContract
+  //       .listStock(symbol, name, price, totalSupply)
+  //       .send();
+  //     return result;
+  //   } catch (error) {
+  //     console.error('Error listing stock:', error);
+  //     throw error;
+  //   }
+  // }
 
   async listStock(
     symbol: string,
@@ -138,12 +162,64 @@ export class TronService {
     totalSupply: number
   ) {
     try {
+      if (!this.stockExchangeContract) {
+        throw new Error(
+          'Stock Exchange contract not initialized. Please initialize it first using /stock-exchange/initialize endpoint.'
+        );
+      }
+
+      console.log('\nListing Stock Details:');
+      console.log('---------------------');
+      console.log('Symbol:', symbol);
+      console.log('Name:', name);
+      console.log('Price:', price, 'TRX');
+      console.log('Total Supply:', totalSupply);
+      console.log('Network:', config.network);
+      console.log('Contract Address:', this.stockExchangeContract.address);
+      console.log('---------------------');
+
       const result = await this.stockExchangeContract
         .listStock(symbol, name, price, totalSupply)
         .send();
-      return result;
+
+      // Log the raw result for debugging
+      console.log('Raw transaction result:', JSON.stringify(result, null, 2));
+
+      // Extract transaction ID from the result
+      const txId =
+        result?.txid ||
+        result?.transaction ||
+        result?.transaction_id ||
+        result?.result?.txid;
+
+      console.log('\nTransaction Details:');
+      console.log('-------------------');
+      console.log('Transaction ID:', txId);
+      console.log(
+        'Transaction URL:',
+        `https://${
+          config.network === 'shasta' ? 'shasta.' : ''
+        }tronscan.org/#/transaction/${txId}`
+      );
+      console.log('-------------------\n');
+
+      return {
+        result,
+        transactionId: txId,
+        transactionUrl: `https://${
+          config.network === 'shasta' ? 'shasta.' : ''
+        }tronscan.org/#/transaction/${txId}`,
+        stockDetails: {
+          symbol,
+          name,
+          price,
+          totalSupply,
+        },
+        status: 'success',
+        message: 'Stock listed successfully',
+      };
     } catch (error) {
-      console.error('Error listing stock:', error);
+      console.error('\nError listing stock:', error);
       throw error;
     }
   }

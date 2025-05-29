@@ -53,12 +53,15 @@ interface UpdatePriceBody {
   newPrice: number;
 }
 
-const app = express();
-const router = Router();
+export const router = Router();
 const tronService = new TronService();
 
+const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Mount the router
+app.use('/', router);
 
 // Initialize stock exchange contract
 let stockExchangeAddress: string | null = null;
@@ -240,8 +243,6 @@ router.get('/stock-exchange/stock/:symbol', (async (
     res.status(500).json({ error: error.message });
   }
 }) as RequestHandler);
-
-app.use('/', router);
 
 const PORT = config.port || 3000;
 app.listen(PORT, () => {
